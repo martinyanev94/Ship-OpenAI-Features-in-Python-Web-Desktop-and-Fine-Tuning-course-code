@@ -1,0 +1,8 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>My quizzes</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"></head>
+<body class="bg-light"><main class="container py-5"><h1>My quizzes</h1>
+{% if quizzes %}<div class="list-group">{% for quiz in quizzes %}<div class="list-group-item d-flex justify-content-between align-items-center">
+<span>Quiz {{ quiz.id }} · {{ quiz.created_at|date:"Y-m-d H:i" }} · {{ quiz.questions.count }} questions</span>
+<a class="btn btn-outline-primary btn-sm" href="{% url 'download' quiz.id %}">Download</a></div>{% endfor %}</div>
+{% else %}<p>No quizzes saved yet.</p>{% endif %}<a class="btn btn-link px-0" href="{% url 'generate' %}">Generate another</a></main></body></html>
