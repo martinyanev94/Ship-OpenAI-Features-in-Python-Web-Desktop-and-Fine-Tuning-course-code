@@ -1,0 +1,2 @@
+# Ship-OpenAI-Features-in-Python-Web-Desktop-and-Fine-Tuning-course-code
+This OpenAI Python tutorial teaches you to build and ship practical AI applications across web, desktop, and fine-tuning workflows. Create runnable products that connect Chat Completions, DALL-E, Whisper, Stripe, Azure, Django, Flask, Tkinter, PyQt, and PowerPoint automation. You will learn how to: • Authenticate securely and verify Chat Completion
