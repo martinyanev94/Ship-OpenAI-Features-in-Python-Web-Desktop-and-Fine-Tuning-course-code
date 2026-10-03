@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Code Bug Fixer</title>
+  <style>
+    :root {
+      --ink: #1c2430;
+      --muted: #5a6573;
+      --line: #c9d2dc;
+      --panel: #ffffff;
+      --page: #eef2f6;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--ink);
+      background: linear-gradient(165deg, #e8eef4 0%, #f3f0ea 55%, #eef2f6 100%);
+      min-height: 100vh;
+    }
+    .header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 1.6rem;
+      letter-spacing: -0.02em;
+    }
+    .layout {
+      display: grid;
+      gap: 1.25rem;
+      padding: 1.25rem 1.5rem 2rem;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+    .container {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      padding: 1rem 1.1rem 1.15rem;
+    }
+    .container h2 {
+      margin: 0 0 0.75rem;
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    label {
+      display: block;
+      margin: 0.65rem 0 0.3rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+    }
+    textarea {
+      width: 100%;
+      padding: 0.65rem 0.75rem;
+      border: 1px solid var(--line);
+      font: 0.95rem/1.4 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      resize: vertical;
+      background: #fbfcfe;
+      color: var(--ink);
+    }
+    textarea[readonly] {
+      background: #f4f7fa;
+    }
+    #fix-btn {
+      margin-top: 0.9rem;
+      padding: 0.65rem 1.1rem;
+      border: 1px solid #1f4b6e;
+      background: #1f4b6e;
+      color: #fff;
+      font: inherit;
+      cursor: pointer;
+    }
+    #fix-btn:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+    .outputs {
+      display: grid;
+      gap: 1rem;
+    }
+    @media (min-width: 900px) {
+      .outputs {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    .status {
+      margin-top: 0.75rem;
+      min-height: 1.25rem;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Code Bug Fixer</h1>
+  </div>
+  <div class="layout">
+    <div class="container inputs">
+      <h2>Inputs</h2>
+      <label for="code">Code</label>
+      <textarea id="code" rows="10" placeholder="Paste broken code"></textarea>
+      <label for="error">Error</label>
+      <textarea id="error" rows="4" placeholder="Paste the runtime error"></textarea>
+      <button type="button" id="fix-btn">Code Fix</button>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+    <div class="container outputs">
+      <div>
+        <label for="explanation">Explanation</label>
+        <textarea id="explanation" rows="12" readonly></textarea>
+      </div>
+      <div>
+        <label for="fixed-code">Fixed Code</label>
+        <textarea id="fixed-code" rows="12" readonly></textarea>
+      </div>
+    </div>
+  </div>
+  <script>
+    async function runFix() {
+      const codeEl = document.getElementById("code");
+      const errorEl = document.getElementById("error");
+      const explanationEl = document.getElementById("explanation");
+      const fixedCodeEl = document.getElementById("fixed-code");
+      const statusEl = document.getElementById("status");
+      const btn = document.getElementById("fix-btn");
+
+      const code = codeEl.value.trim();
+      const error = errorEl.value.trim();
+      if (!code || !error) {
+        statusEl.textContent = "Paste both code and an error message first.";
+        return;
+      }
+
+      btn.disabled = true;
+      statusEl.textContent = "Requesting explanation and fix...";
+      explanationEl.value = "";
+      fixedCodeEl.value = "";
+
+      try {
+        const res = await fetch("/fix", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code, error }),
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          explanationEl.value = data.error || "Request failed";
+          statusEl.textContent = "Request failed.";
+          return;
+        }
+        explanationEl.value = data.explanation || "";
+        fixedCodeEl.value = data.fixed_code || "";
+        statusEl.textContent = "Done. Copy Fixed Code when ready.";
+      } catch (err) {
+        explanationEl.value = "Network error talking to /fix";
+        statusEl.textContent = "Network error.";
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    document.getElementById("fix-btn").addEventListener("click", runFix);
+  </script>
+</body>
+</html>
