@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Code Bug Fixer</title></head>
+<body>
+  <main>
+    <h1>Code Bug Fixer</h1>
+    {% if premium %}
+      <p data-status="premium">Premium access is active.</p>
+      <form id="fix-form">
+        <textarea id="code" placeholder="Paste code"></textarea>
+        <textarea id="error" placeholder="Paste the error"></textarea>
+        <button>Fix code</button>
+      </form>
+      <pre id="result"></pre>
+    {% else %}
+      <p data-status="free">Upgrade to unlock the bug fixer.</p>
+      <form action="/checkout" method="post"><button type="submit">Upgrade</button></form>
+    {% endif %}
+  </main>
+</body>
+</html>
